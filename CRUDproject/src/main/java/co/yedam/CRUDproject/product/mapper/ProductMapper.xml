@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.yedam.CRUDproject.product.mapper.ProductMapper">
+	<select id="productSelectList"
+		resultType="co.yedam.CRUDproject.product.service.ProductVO">
+		SELECT * FROM PRODUCT
+	</select>
+
+	<select id="productSelect"
+		resultType="co.yedam.CRUDproject.product.service.ProductVO">
+		SELECT * FROM PRODUCT WHERE PRODUCT_ID = #{productId}
+	</select>
+
+	<insert id="productInsert"
+		parameterType="co.yedam.CRUDproject.product.service.ProductVO">
+		INSERT INTO PRODUCT (PRODUCT_ID, PRODUCT_NAME, PRODUCT_BRAND, PRODUCT_PRICE, PRODUCT_CONTENT, PRODUCT_COUNT)
+		SELECT #{productId}, #{productName}, #{productBrand}, #{productPrice}, #{productContent}, #{productCount}
+		FROM DUAL A
+		WHERE NOT EXISTS(
+		SELECT 0
+		FROM PRODUCT
+		WHERE PRODUCT_NAME = #{productName})
+	</insert>
+
+	<update id="productUpdate"
+		parameterType="co.yedam.CRUDproject.product.service.ProductVO">
+		UPDATE PRODUCT
+		<set>
+			<if test="productName != null">PRODUCT_NAME = #{productName},</if>
+			<if test="productBrand != null">PRODUCT_BRAND = #{productBrand},</if>
+			<if test="productPrice != 0">PRODUCT_PRICE = #{productPrice},</if>
+			<if test="productContent != null">PRODUCT_CONTENT = #{productContent},</if>
+			<if test="productCount != 0">PRODUCT_COUNT = #{productCount},</if>
+		</set>
+		WHERE PRODUCT_ID = #{productId}
+	</update>
+
+	<delete id="productDelete"
+		parameterType="co.yedam.CRUDproject.product.service.ProductVO">
+		DELETE FROM PRODUCT WHERE PRODUCT_ID = #{productId}
+	</delete>
+</mapper>

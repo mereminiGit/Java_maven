@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.yedam.CRUDproject.member.mapper.MemberMapper">
+	<select id="memberSelectList"
+		resultType="co.yedam.CRUDproject.member.service.MemberVO">
+		SELECT * FROM MEMBER
+	</select>
+
+	<select id="memberSelect"
+		resultType="co.yedam.CRUDproject.member.service.MemberVO">
+		SELECT * FROM MEMBER WHERE member_id = #{memberId}
+
+		<if test="memberPassword != null">
+			AND member_password = #{memberPassword}
+		</if>
+	</select>
+
+	<insert id="memberInsert"
+		parameterType="co.yedam.CRUDproject.member.service.MemberVO">
+		INSERT INTO MEMBER (MEMBER_ID, MEMBER_PASSWORD, MEMBER_NAME, MEMBER_EMAIL, MEMBER_TEL, MEMBER_CHECK)
+		SELECT #{memberId}, #{memberPassword}, #{memberName}, #{memberEmail}, #{memberTel}, #{memberCheck}
+		FROM DUAL A
+		WHERE NOT EXISTS(
+		SELECT 0
+		FROM MEMBER
+		WHERE MEMBER_EMAIL = #{memberEmail})
+	</insert>
+
+	<update id="memberUpdate"
+		parameterType="co.yedam.CRUDproject.member.service.MemberVO">
+		UPDATE MEMBER
+		<set>
+			<if test="memberPassword != null">member_password = #{memberPassword},</if>
+			<if test="memberName != null">member_name = #{memberName},</if>
+			<if test="memberTel != null">member_tel = #{memberTel},</if>
+			<if test="memberCheck != 0">member_check = #{memberCheck},</if>
+		</set>
+		WHERE member_id = #{memberId}
+	</update>
+
+	<delete id="memberDelete"
+		parameterType="co.yedam.CRUDproject.member.service.MemberVO">
+		DELETE FROM MEMBER WHERE MEMBER_ID = #{memberId}
+	</delete>
+</mapper>
