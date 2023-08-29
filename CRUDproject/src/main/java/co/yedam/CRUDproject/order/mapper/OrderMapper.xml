@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="co.yedam.CRUDproject.order.mapper.OrderMapper">
+
+	<select id="orderSelectList"
+		resultType="co.yedam.CRUDproject.order.service.OrderVO">
+		SELECT * FROM ORDERPRODUCT
+	</select>
+
+	<select id="orderSelect"
+		resultType="co.yedam.CRUDproject.order.service.OrderVO">
+		SELECT * FROM ORDERPRODUCT WHERE ORDER_NO = #{orderNo}
+	</select>
+
+	<insert id="orderInsert"
+		parameterType="co.yedam.CRUDproject.order.service.OrderVO">
+		INSERT INTO ORDERPRODUCT (ORDER_NO, ORDER_NAME, ORDER_TEL, ORDER_ADDRESS, ORDER_COUNT)
+		VALUES (#{orderNo}, #{orderName}, #{orderTel}, #{orderAddress}, #{orderCount})
+	</insert>
+
+	<update id="orderUpdate"
+		parameterType="co.yedam.CRUDproject.order.service.OrderVO">
+		UPDATE ORDERPRODUCT
+		<set>
+			<if test="orderName != null">ORDER_NAME = #{orderName},</if>
+			<if test="orderTel != null">ORDER_TEL = #{orderTel},</if>
+			<if test="orderAddress != null">ORDER_ADDRESS = #{orderAddress},</if>
+			<if test="orderCount != 0">ORDER_COUNT = #{orderCount},</if>
+		</set>
+		WHERE ORDER_NO = #{orderNo}
+	</update>
+
+	<delete id="orderDelete"
+		parameterType="co.yedam.CRUDproject.order.service.OrderVO">
+		DELETE FROM ORDERPRODUCT WHERE ORDER_NO = #{orderNo}
+	</delete>
+
+</mapper>

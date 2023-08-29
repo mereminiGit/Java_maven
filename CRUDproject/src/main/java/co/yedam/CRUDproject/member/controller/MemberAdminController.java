@@ -112,7 +112,8 @@ public class MemberAdminController {
 		String id = printString("수정 할 아이디");
 		if (memberSelect(id)) {
 			UpdateSubmenu();
-
+			vo.setMemberId(id);
+			
 			System.out.print("수정항목 입력(중복 가능 띄어쓰기로 구분)>> ");
 			String[] menu = sc.nextLine().split(" ");
 
