@@ -4,9 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import co.yedam.CRUDproject.member.controller.MemberAdminController;
+import co.yedam.CRUDproject.member.service.MemberVO;
 import co.yedam.CRUDproject.order.service.OrderService;
 import co.yedam.CRUDproject.order.service.OrderVO;
 import co.yedam.CRUDproject.order.serviceImpl.OrderServiceImpl;
+import co.yedam.CRUDproject.product.controller.ProductAdminController;
 import co.yedam.CRUDproject.product.service.ProductService;
 import co.yedam.CRUDproject.product.service.ProductVO;
 import co.yedam.CRUDproject.product.serviceImpl.ProductServiceImpl;
@@ -47,21 +50,46 @@ public class OrderAdminController {
 				
 			case 2:		// 주문 상세 조회
 				System.out.println("==============================");
-				System.out.println("--------- 제 품 조 회 ---------");
+				System.out.println("--------- 주 문 조 회 ---------");
 				System.out.println("------------------------------");
 
 				String no = printString("주문번호");
 
 				if (orderSelect(no)) {
+					// 제품명, 이메일, 결제금액 
+					
+					String id = vo.getProductId();
+					ProductAdminController Pcontrol = new ProductAdminController();
+					ProductVO Pvo = new ProductVO();
+					
+					Pvo = Pcontrol.productSelectVO(id);
+					
+					vo.setOrderProductName(Pvo.getProductName());
+					
+					// 이메일
+					String memberId = vo.getMemberId();
+					MemberAdminController Mcontrol = new MemberAdminController();
+					MemberVO Mvo = new MemberVO();
+					
+					Mvo = Mcontrol.memberSelectVO(memberId);
+					
+					vo.setOrderMemberEmail(Mvo.getMemberName());
+					
+					// 결제금액
+					int productPrice = Pvo.getProductPrice();
+					vo.setOrederTotal(productPrice * vo.getOrderCount());
+					
 					System.out.println(vo.showOrderDetail());
+					
+					
 				} else
-					System.out.println("존재하지 않는 제품입니다.");
+					System.out.println("존재하지 않는 주문번호 입니다.");
 				System.out.println("==================================================");
 				break;
 				
 			case 3:		// 제품 주문 수정
 				System.out.println("==============================");
-				System.out.println("--------- 제 품 수 정 ---------");
+				System.out.println("--------- 주 문 수 정 ---------");
 				System.out.println("------------------------------");
 				orderUpdate();
 				System.out.println("==================================================");
@@ -69,7 +97,7 @@ public class OrderAdminController {
 				
 			case 4:		// 제품 주문 삭제
 				System.out.println("==============================");
-				System.out.println("--------- 제 품 삭 제 ---------");
+				System.out.println("--------- 주 문 삭 제 ---------");
 				System.out.println("------------------------------");
 				orderDelete();
 				System.out.println("==================================================");
@@ -84,7 +112,7 @@ public class OrderAdminController {
 	} // end of run
 	
 	// 주문 삭제
-	private void orderDelete() {
+	public void orderDelete() {
 		vo = new OrderVO();
 		String no = printString("주문번호");
 		vo.setOrderNo(no);
@@ -95,19 +123,39 @@ public class OrderAdminController {
 			System.out.println("존재하지 않는 주문번호 입니다.");			
 	}
 
+	// 주문 삭제
+	public void orderDeleteUser(String no) {
+		vo = new OrderVO();
+		vo.setOrderNo(no);
+		
+		if(dao.orderDelete(vo) != 0)
+			System.out.println("삭제가 완료되었습니다.");
+		else
+			System.out.println("존재하지 않는 주문번호 입니다.");			
+	}
+	
 	// 주문 수정
-	private void orderUpdate() {
+	public void orderUpdate() {
 		vo = new OrderVO();
 		ProductVO Pvo = new ProductVO();
 		ProductService Pdao = new ProductServiceImpl();
+		ProductAdminController Pcontrol = new ProductAdminController();
 		
 		String no = printString("주문번호");
 		
 		if(orderSelect(no)) {
 			updateSubmenu();
+			// 수정 전 주문 수량을 제품 수량에 더하기
+			String id = vo.getProductId();
 			
-			System.out.println("수정항목 선택(중복 가능 띄어쓰기로 구분)>> ");
+			int num = vo.getOrderCount();
+//			System.out.println(num);
+			Pvo = Pcontrol.productSelectVO(id);
+			
+			
+			System.out.print("수정항목 선택(중복 가능 띄어쓰기로 구분)>> ");
 			String[] menu = sc.nextLine().split(" ");
+			
 			
 			for(int i = 0; i < menu.length; i++) {
 				switch(Integer.parseInt(menu[i])) {
@@ -115,21 +163,38 @@ public class OrderAdminController {
 					String name = printString("받는사람(수정)");
 					vo.setOrderName(name);
 					break;
+					
 				case 2:
 					String tel = printString("전화번호(수정)");
 					vo.setOrderTel(tel);
 					break;
+					
 				case 3:
 					String add = printString("배송주소");
 					vo.setOrderAddress(add);
 					break;
+					
 				case 4:
 					int count = Integer.parseInt(printString("주문수량"));
 					vo.setOrderCount(count);
+					// 주문 수량 변경시 제품 수량 변경
+					if(count != num) {
+//						System.out.println(Pvo.getProductCount());
+						int chageNo = (Pvo.getProductCount() + num) - vo.getOrderCount();
+						if(chageNo < 0) {
+							System.out.println("제품수량이 " + Pvo.getProductCount() + "남았습니다.");
+							System.out.println("주문수량을 변경할 수 없습니다. | 다시 입력해주세요.");
+							vo.setOrderCount(num);
+							return;
+						}
+						
+						Pcontrol.productUpdateCount(chageNo, id);
+					}
 					break;
+					
 				case 5:
 					System.out.println("수정을 취소합니다.");
-					break;
+					return;
 				default:
 					System.out.println("잘못된 입력입니다.");
 				}
@@ -138,8 +203,80 @@ public class OrderAdminController {
 			int n = dao.orderUpdate(vo);
 			if(n != 0) {
 				System.out.println("수정이 완료되었습니다.");
-				
-				
+			}
+			else
+				System.out.println("수정이 실패했습니다.");
+		} else 
+			System.out.println("존재하지 않는 주문번호 입니다.");
+	}
+	
+	
+	public void orderUpdateUser(String no) {
+		vo = new OrderVO();
+		ProductVO Pvo = new ProductVO();
+		ProductService Pdao = new ProductServiceImpl();
+		ProductAdminController Pcontrol = new ProductAdminController();
+		
+		if(orderSelect(no)) {
+			updateSubmenu();
+			// 수정 전 주문 수량을 제품 수량에 더하기
+			String id = vo.getProductId();
+			
+			int num = vo.getOrderCount();
+//			System.out.println(num);
+			Pvo = Pcontrol.productSelectVO(id);
+			
+			
+			System.out.print("수정항목 선택(중복 가능 띄어쓰기로 구분)>> ");
+			String[] menu = sc.nextLine().split(" ");
+			
+			
+			for(int i = 0; i < menu.length; i++) {
+				switch(Integer.parseInt(menu[i])) {
+				case 1:
+					String name = printString("받는사람(수정)");
+					vo.setOrderName(name);
+					break;
+					
+				case 2:
+					String tel = printString("전화번호(수정)");
+					vo.setOrderTel(tel);
+					break;
+					
+				case 3:
+					String add = printString("배송주소");
+					vo.setOrderAddress(add);
+					break;
+					
+				case 4:
+					int count = Integer.parseInt(printString("주문수량"));
+					vo.setOrderCount(count);
+					// 주문 수량 변경시 제품 수량 변경
+					if(count != num) {
+//						System.out.println(Pvo.getProductCount());
+						int chageNo = (Pvo.getProductCount() + num) - vo.getOrderCount();
+						if(chageNo < 0) {
+							System.out.println("제품수량이 " + Pvo.getProductCount() + "남았습니다.");
+							System.out.println("주문수량을 변경할 수 없습니다. | 다시 입력해주세요.");
+							vo.setOrderCount(num);
+							return;
+						}
+						
+						Pcontrol.productUpdateCount(chageNo, id);
+					}
+					break;
+					
+				case 5:
+					System.out.println("수정을 취소합니다.");
+					return;
+				default:
+					System.out.println("잘못된 입력입니다.");
+				}
+			}
+			
+			int n = dao.orderUpdate(vo);
+			if(n != 0) {
+				System.out.println("수정이 완료되었습니다.");
 			}
 			else
 				System.out.println("수정이 실패했습니다.");

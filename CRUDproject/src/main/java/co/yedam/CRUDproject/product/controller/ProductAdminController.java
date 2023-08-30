@@ -152,7 +152,7 @@ public class ProductAdminController {
 					break;
 				case 6:
 					System.out.println("수정을 취소합니다.");
-					break;
+					return;
 				default:
 					System.out.println("잘못된 입력입니다.");
 				}
@@ -179,6 +179,22 @@ public class ProductAdminController {
 		System.out.println("========= 4. 제품 설명 ===========");
 		System.out.println("========= 5. 제품 수량 ===========");
 		System.out.println("========= 6. 취   소 ============");
+	}
+	
+	// 제품 수량 수정
+	public void productUpdateCount(int count, String id) {
+		vo = new ProductVO();
+		
+		vo.setProductId(id);
+		vo.setProductCount(count);
+		
+//		System.out.println(vo.getProductId());
+//		System.out.println(vo.getProductCount());
+		int n = dao.productUpdate(vo);
+		if(n != 0)
+			System.out.println("제품 수량 수정이 완료되었습니다.");
+		else
+			System.out.println("제품 수량 수정이 실패했습니다.");
 	}
 
 	// 제품 등록
@@ -221,6 +237,20 @@ public class ProductAdminController {
 		else
 			return false;
 
+	}
+	
+	// 제품 상세 조회 vo객체 리턴
+	public ProductVO productSelectVO(String id) {
+		vo = new ProductVO();
+		
+		vo.setProductId(id);
+		vo = dao.productSelect(vo);
+		
+		if (vo != null)
+			return vo;
+		else
+			return null;
+		
 	}
 
 	// 제품 목록

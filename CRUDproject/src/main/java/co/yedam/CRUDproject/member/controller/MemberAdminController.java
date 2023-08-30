@@ -139,7 +139,7 @@ public class MemberAdminController {
 					break;
 				case 5:
 					System.out.println("수정을 취소합니다.");
-					break;
+					return;
 				default:
 					System.out.println("잘못된 입력입니다.");
 				}
@@ -156,6 +156,52 @@ public class MemberAdminController {
 		} else
 			System.out.println("존재하지 않는 아이디입니다.");
 	}
+	
+	// 사용자 수정 외부 참조 (고객용)
+	public void memberUpdateUser(String id) {
+		vo = new MemberVO();
+		if (memberSelect(id)) {
+			UpdateSubmenuUser();
+			vo.setMemberId(id);
+			
+			System.out.print("수정항목 입력(중복 가능 띄어쓰기로 구분)>> ");
+			String[] menu = sc.nextLine().split(" ");
+			
+			for (int i = 0; i < menu.length; i++) {
+				switch (Integer.parseInt(menu[i])) {
+				case 1: // 패스워드 수정
+					String pw = printString("패스워드(수정)");
+					vo.setMemberPassword(pw);
+//					System.out.println(vo.getMemberPassword());
+					break;
+				case 2: // 이름 수정
+					String name = printString("이름(수정)");
+					vo.setMemberName(name);
+					
+					break;
+				case 3: // 전화번호 수정
+					String tel = printString("전화번호(수정)");
+					vo.setMemberTel(tel);
+					break;
+				case 4:
+					System.out.println("수정을 취소합니다.");
+					return;
+				default:
+					System.out.println("잘못된 입력입니다.");
+				}
+			}
+			
+//			System.out.println(vo.showMemberDetail());
+			
+			int n = dao.memberUpdate(vo);
+			if(n != 0)
+				System.out.println("수정이 완료되었습니다.");
+			else
+				System.out.println("수정을 실패했습니다.");
+			
+		} else
+			System.out.println("존재하지 않는 아이디입니다.");
+	}
 
 	// 사용자 수정 서브항목
 	private void UpdateSubmenu() {
@@ -165,8 +211,19 @@ public class MemberAdminController {
 		System.out.println("========== 1. 패스워드 ===========");
 		System.out.println("========== 2. 이   름 ===========");
 		System.out.println("========== 3. 전화번호 ===========");
-		System.out.println("== 4. 관리자 권한 (1 - X, 2 - O) ==");
+		System.out.println("== 4. 관리자 권한 (0 - X, 1 - O) ==");
 		System.out.println("========== 5. 취   소 ===========");
+	}
+	
+	// 사용자 수정 서브항목 (고객용)
+	private void UpdateSubmenuUser() {
+		System.out.println("================================");
+		System.out.println("========== 수정항목 선택 ===========");
+		System.out.println("================================");
+		System.out.println("========== 1. 패스워드 ===========");
+		System.out.println("========== 2. 이   름 ===========");
+		System.out.println("========== 3. 전화번호 ===========");
+		System.out.println("========== 4. 취   소 ===========");
 	}
 
 	// 사용자 등록
@@ -200,7 +257,7 @@ public class MemberAdminController {
 	}
 
 	// 사용자 상세 조회
-	private boolean memberSelect(String id) {
+	public boolean memberSelect(String id) {
 		vo = new MemberVO();
 		vo.setMemberId(id);
 		vo = dao.memberSelect(vo);
@@ -213,6 +270,18 @@ public class MemberAdminController {
 //			System.out.println("존재하지 않는 사용자입니다.");
 			return false;
 //		System.out.println("--------------------------------------------------");
+	}
+	
+	// 사용자 상제 조회 vo객체 리턴
+	public MemberVO memberSelectVO(String id) {
+		vo = new MemberVO();
+		vo.setMemberId(id);
+		vo = dao.memberSelect(vo);
+
+		if (vo != null)
+			return vo;
+		else
+			return null;
 	}
 
 	// 사용자 전체 조회

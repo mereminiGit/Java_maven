@@ -5,6 +5,7 @@
 	<select id="orderSelectList"
 		resultType="co.yedam.CRUDproject.order.service.OrderVO">
 		SELECT * FROM ORDERPRODUCT
+		
 	</select>
 
 	<select id="orderSelect"
@@ -14,8 +15,12 @@
 
 	<insert id="orderInsert"
 		parameterType="co.yedam.CRUDproject.order.service.OrderVO">
-		INSERT INTO ORDERPRODUCT (ORDER_NO, ORDER_NAME, ORDER_TEL, ORDER_ADDRESS, ORDER_COUNT)
-		VALUES (#{orderNo}, #{orderName}, #{orderTel}, #{orderAddress}, #{orderCount})
+		<selectKey keyProperty="orderNo" resultType="String" order="BEFORE">
+			SELECT NVL(MAX(order_no), 0) + 1
+			FROM ORDERPRODUCT
+		</selectKey>
+		INSERT INTO ORDERPRODUCT (ORDER_NO, ORDER_NAME, ORDER_TEL, ORDER_ADDRESS, ORDER_COUNT, PRODUCT_ID, MEMBER_ID)
+		VALUES (#{orderNo}, #{orderName}, #{orderTel}, #{orderAddress}, #{orderCount}, #{productId}, #{memberId})
 	</insert>
 
 	<update id="orderUpdate"

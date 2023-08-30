@@ -14,6 +14,18 @@
 			AND member_password = #{memberPassword}
 		</if>
 	</select>
+	
+	<select id="memberSelectEmail"
+		resultType="co.yedam.CRUDproject.member.service.MemberVO">
+		SELECT * FROM MEMBER WHERE MEMBER_EMAIL = #{memberEmail}
+
+		<if test="memberName != null">
+			AND MEMBER_NAME = #{memberName}
+		</if>
+		<if test="memberId != null">
+			AND MEMBER_ID = #{memberId}
+		</if>
+	</select>
 
 	<insert id="memberInsert"
 		parameterType="co.yedam.CRUDproject.member.service.MemberVO">

@@ -12,14 +12,15 @@ public class OrderVO {
 	private String orderAddress;
 	private LocalDate orderDate;
 	private int orderCount;
-	private String orderProductId;
-	private String orderMemberId;
+	private String ProductId;
+	private String MemberId;
 	
 	private String orderProductName;
-	private String orderProductEmail;
+	private String orderMemberEmail;
+	private int orederTotal;
 	
 	public String showOrderList() {
-		return " | 주문번호: " + orderNo + " | 제품코드: " + orderProductId + " | 아이디: " + orderMemberId;
+		return " | 주문번호: " + orderNo + " | 제품코드: " + ProductId + " | 아이디: " + MemberId;
 	}
 	
 	public String showOrderDetail() {
@@ -27,10 +28,10 @@ public class OrderVO {
 				+"--------------------------------------------------" + "\n"
 			+ " | 배송주소: " + orderAddress + " | 주문일자: " + orderDate + "\n"
 			+"--------------------------------------------------" + "\n"
-			+ " | 제품코드: " + orderProductId + " | 제품명: " + orderProductName + " | 주문수량: " + orderCount + "\n"
+			+ " | 제품코드: " + ProductId + " | 제품명: " + orderProductName + " | 주문수량: " + orderCount + "\n"
 			+"--------------------------------------------------" + "\n"
-			+ " | 아이디: " + orderMemberId + " | 이메일: " + orderProductEmail + "\n"
+			+ " | 아이디: " + MemberId + " | 이메일: " + orderMemberEmail + "\n"
 			+"--------------------------------------------------" + "\n"
-			+" | 결제금액: " + orderProductEmail;
+			+" | 결제금액: " + orederTotal;
 	}
 }
